@@ -4,16 +4,21 @@ from pathlib import Path
 
 
 @pytest.fixture
-def contest():
+def contest(benchmark):
 
     def run(contest, input_path):
         comlist = [f"./{contest}"]
-        with input_path.open('r') as input_file:
-            res = subprocess.run(comlist, stdin=input_file,
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        assert res.stderr == b''
-        assert res.returncode == 0
-        return res.stdout.decode("utf-8")
+
+        @benchmark
+        def run_bench():
+            with input_path.open('r') as input_file:
+                res = subprocess.run(comlist, stdin=input_file,
+                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            assert res.stderr == b''
+            assert res.returncode == 0
+            return res.stdout.decode("utf-8")
+
+        return run_bench
 
     return run
 
