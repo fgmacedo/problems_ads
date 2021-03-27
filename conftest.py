@@ -1,6 +1,7 @@
-import pytest
 import subprocess
 from pathlib import Path
+
+import pytest
 
 
 SLICE_REMOVE_INPUT_PREFIX_AND_SUFFIX = slice(0, -3)
@@ -30,20 +31,13 @@ def pytest_generate_tests(metafunc):
     if "program" not in metafunc.fixturenames:
         return
 
-    programs = Path("problems").glob("**/*.py")
-
-    for program in programs:
-        metafunc.parametrize("program", [
-            pytest.param(program, id=f"{program}"),
-        ])
-
-        cases = program.parent.glob("**/*.in")
-
-        metafunc.parametrize("input_file, output_file", [
-            pytest.param(
-                item,
-                item.with_suffix(".out"),
-                id=f"{item.name[SLICE_REMOVE_INPUT_PREFIX_AND_SUFFIX]}",
-            )
-            for item in cases
-        ])
+    metafunc.parametrize("program, input_file, output_file", [
+        pytest.param(
+            program,
+            case,
+            case.with_suffix(".out"),
+            id=f"{program}-{case.name[SLICE_REMOVE_INPUT_PREFIX_AND_SUFFIX]}",
+        )
+        for program in Path("problems").glob("**/*.py")
+        for case in program.parent.glob("**/*.in")
+    ])

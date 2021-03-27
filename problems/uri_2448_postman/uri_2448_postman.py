@@ -1,4 +1,4 @@
-#!/home/fernando/.pyenv/versions/3.8.1/envs/curso_aed/bin/python
+#!/usr/bin/env python3
 import sys
 
 rl = sys.stdin.readline
