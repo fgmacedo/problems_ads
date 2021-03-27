@@ -30,12 +30,9 @@ def pytest_generate_tests(metafunc):
     if "program" not in metafunc.fixturenames:
         return
 
-
-
     programs = Path("problems").glob("**/*.py")
 
     for program in programs:
-
         metafunc.parametrize("program", [
             pytest.param(program, id=f"{program}"),
         ])
