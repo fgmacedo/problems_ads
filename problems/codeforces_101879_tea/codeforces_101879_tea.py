@@ -8,6 +8,9 @@ from operator import attrgetter
 get_peek = attrgetter("peek")  # lambda x: x.peek
 debug = "--debug" in sys.argv
 
+"""
+Turn the scritp executable
+"""
 
 class Tower:
 
@@ -32,10 +35,11 @@ class Tower:
 
     def to(self, other, logger):
         if self.empty():
+            if debug: print(f"  empty tower: {self} to {other.name}")
             return
         other_peek = other.peek
         if  other_peek and other_peek < self.peek:
-            # print(f"invalid movement: {self.name} {other.name}")
+            if debug: print(f"  invalid movement: {self} {other}")
             return
         disc = self._pop()
         other._push(disc)
@@ -83,12 +87,48 @@ def hanoi_tower_solver(n, o, d, a, expected_moves=0):
     else:
         pegs = deque([o, d, a])
 
-    moves = 0
-    while len(d) != n:
-        if debug: previous_state = repr(pegs)
+    if debug: ref_pegs = list(pegs)
 
+    moves = 0
+    while len(d) != n or extra_moves:
+        if debug: previous_state = repr(ref_pegs)
+        move_smallest_disc = moves % 2 == 0
+
+        if extra_moves:
+            # overpriced contract, need to expend the money anyway
+            symmetric_moves = extra_moves // 2
+            odd_extra_move = extra_moves % 2
+
+            if debug: print(f"extra_moves: {extra_moves}, symmetric_moves:{symmetric_moves}, odd_extra_move:{odd_extra_move}")
+
+            for _ in range(symmetric_moves):
+                source, destination = pegs[0], pegs[1]
+                disc = source.to(destination, logger)
+                if debug:
+                    print(f"{moves:0>3} EXTRA SYM{_} | {previous_state} | {source} -{disc}-> {destination} ({move_smallest_disc}) | {ref_pegs}\r\n       {', '.join(movements)}\r\n")
+                    previous_state = repr(ref_pegs)
+                moves += 1
+                source, destination = destination, source
+                disc = source.to(destination, logger)
+                if debug:
+                    print(f"{moves:0>3} EXTRA SYM{_} | {previous_state} | {source} -{disc}-> {destination} ({move_smallest_disc}) | {ref_pegs}\r\n       {', '.join(movements)}\r\n")
+                    previous_state = repr(ref_pegs)
+            if odd_extra_move:
+                source, destination = pegs[0], pegs[2]
+                disc = source.to(destination, logger)
+
+                # we need to put in a state on what we can start the hanoi sollution
+                pegs.appendleft(pegs.pop())
+                if debug:
+                    print(f"{moves:0>3} EXTRA  +1 | {previous_state} | {source} -{disc}-> {destination} ({move_smallest_disc}) | {ref_pegs}\r\n       {', '.join(movements)}\r\n")
+                    previous_state = repr(ref_pegs)
+                moves = 0
+            else:
+                moves = -1
+            extra_moves = 0
+            if debug: print(f"Going to the normal solution: {previous_state}\r\n")
         # alter between moves of the lower disc or the other possible movement
-        if moves % 2 == 0:
+        elif move_smallest_disc:
             source, destination = pegs[0], pegs[1]
             disc = source.to(destination, logger)
         else:
@@ -101,7 +141,7 @@ def hanoi_tower_solver(n, o, d, a, expected_moves=0):
             pegs.append(pegs.popleft())
 
         if debug:
-            print(f"{moves:0>3} | {previous_state} | {source} -{disc}-> {destination} | {pegs}\r\n       {', '.join(movements)}\r\n")
+            print(f"{moves:0>3} | {previous_state} | {source} -{disc}-> {destination} ({move_smallest_disc}) | {ref_pegs}\r\n       {', '.join(movements)}\r\n")
             sleep(0.2)
         moves += 1
 
@@ -109,6 +149,7 @@ def hanoi_tower_solver(n, o, d, a, expected_moves=0):
 
 
 rl = sys.stdin.readline
+sys.stdin = open("/dev/tty")
 boats, trips = map(int, rl().split())  # n, k
 
 a = Tower('A', range(boats, 0, -1))  # Portugal
@@ -116,4 +157,6 @@ b = Tower('B')  # China
 c = Tower('C')  # England
 
 movements = hanoi_tower_solver(boats, a, c, b, trips)
+
+if debug: print(f"\r\nSolution expected in {trips} and found in {len(movements)} movements:")
 print('\n'.join(movements))
