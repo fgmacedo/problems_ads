@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 import sys
-from collections import deque
-from itertools import cycle
+from collections import deque, namedtuple
 from time import sleep
 from operator import attrgetter
 
 
 get_peek = attrgetter("peek")  # lambda x: x.peek
-
+debug = "--debug" in sys.argv
 
 
 class Tower:
@@ -52,7 +51,7 @@ class Tower:
 
 
 
-def hanoi_tower_solver(o, d, a, extra_moves=0):
+def hanoi_tower_solver(n, o, d, a, expected_moves=0):
     """
     Rules:
     1. Move only one disc at time.
@@ -67,82 +66,54 @@ def hanoi_tower_solver(o, d, a, extra_moves=0):
     """
     movements = []
     logger = movements.append
-    pegs = [o, d, a]
-    pegs_len = len(pegs)
 
-    n = len(o)
+    minimum_moves = (2 ** n) - 1
+    extra_moves = expected_moves - minimum_moves
+
+    if extra_moves < 0:
+        print("N")
+        exit(0)
+    else:
+        print("Y")
+
     is_even = n % 2 == 0
-    # print(f"is_even: {is_even}")
 
     if is_even:
-        pegs = [o, a, d]
-        d, a = a, d
+        pegs = deque([o, a, d])
+    else:
+        pegs = deque([o, d, a])
 
-    i = 0
-    while extra_moves > 0:
-        # print(f"{i:0>3}","extra", o, d, a, extra_moves, ', '.join(movements))
-        iteration = i % 3
-        if iteration == 0:
-            o.to(d, logger)
-        elif iteration == 1:
-            d.to(o, logger)
+    moves = 0
+    while len(d) != n:
+        if debug: previous_state = repr(pegs)
+
+        # alter between moves of the lower disc or the other possible movement
+        if moves % 2 == 0:
+            source, destination = pegs[0], pegs[1]
+            disc = source.to(destination, logger)
         else:
-            o.to(a, logger)
+            source, destination = pegs[0], pegs[2]
+            if not source or (destination and source.peek > destination.peek):
+                source, destination = destination, source
+            disc = source.to(destination, logger)
 
-        extra_moves -= 1
-        i += 1
+            # rotate pegs
+            pegs.append(pegs.popleft())
 
-    last_was_one = False
-    if a.peek == 1:
-        a.to(b, logger)
-        last_was_one = True
-
-    index_of_one = [x.peek for x in pegs].index(1)
-
-    def move_only_possible():
-        pegs_sorted = sorted((x for x in pegs if x.peek), key=get_peek)
-        source = pegs_sorted[1]
-        for peg in pegs:
-            if peg != source and not peg.peek == 1:
-                dest = peg
-        print(f"  move_only_possible: {source} to {dest}")
-        source.to(dest, logger)
-
-    def move_one():
-        next_index = (index_of_one + 1) % pegs_len
-        source = pegs[index_of_one]
-        dest = pegs[next_index]
-        print(f"  move_one: {source} to {dest}")
-        source.to(dest, logger)
-        return next_index
-
-    while (len(d) < n and not is_even) or (len(a) < n and is_even):
-        print(f"{i:0>3} - {pegs} - {', '.join(movements)}")
-        if last_was_one:
-            move_only_possible()
-            last_was_one = False
-        else:
-            index_of_one = move_one()
-            last_was_one = True
-
-        i += 1
-        sleep(0.3)
+        if debug:
+            print(f"{moves:0>3} | {previous_state} | {source} -{disc}-> {destination} | {pegs}\r\n       {', '.join(movements)}\r\n")
+            sleep(0.2)
+        moves += 1
 
     return movements
+
 
 rl = sys.stdin.readline
 boats, trips = map(int, rl().split())  # n, k
 
-needed_moves = (2 ** boats) - 1
-extra_moves = trips - needed_moves
-if extra_moves < 0:
-    print("N")
-    exit(0)
-
-a = Tower('A', reversed(range(1, boats+1)))  # Portugal
+a = Tower('A', range(boats, 0, -1))  # Portugal
 b = Tower('B')  # China
 c = Tower('C')  # England
 
-print("Y")
-mov_hanoi = hanoi_tower_solver(a, c, b, extra_moves)
-print('\n'.join(mov_hanoi))
+movements = hanoi_tower_solver(boats, a, c, b, trips)
+print('\n'.join(movements))
