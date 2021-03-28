@@ -9,7 +9,22 @@ get_peek = attrgetter("peek")  # lambda x: x.peek
 debug = "--debug" in sys.argv
 
 """
-Turn the scritp executable
+Turn the script executable:
+
+> chmod +x ./<name>.py
+
+To turn on optional debug:
+
+> chmod +x ./<name>.py --debug
+
+Example usage with automatic min_required_movements:
+
+    python -c 'b = 2; print(f"{b} {2**b-1}")' | ./codeforces_101879_tea.py --debug
+
+Or using echo:
+
+    echo "2 4" | ./codeforces_101879_tea.py --debug
+
 """
 
 class Tower:
@@ -149,7 +164,6 @@ def hanoi_tower_solver(n, o, d, a, expected_moves=0):
 
 
 rl = sys.stdin.readline
-sys.stdin = open("/dev/tty")
 boats, trips = map(int, rl().split())  # n, k
 
 a = Tower('A', range(boats, 0, -1))  # Portugal
