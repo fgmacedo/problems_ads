@@ -4,10 +4,6 @@ Turn the script executable:
 
 > chmod +x ./<name>.py
 
-To turn on optional debug:
-
-> chmod +x ./<name>.py --debug
-
 """
 import sys
 from collections import deque
