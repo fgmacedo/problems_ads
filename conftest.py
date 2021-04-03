@@ -1,10 +1,13 @@
+import warnings
 import subprocess
 from pathlib import Path
+from os import access, X_OK
 
 import pytest
 
 
 SLICE_REMOVE_INPUT_PREFIX_AND_SUFFIX = slice(0, -3)
+
 
 
 @pytest.fixture
@@ -16,8 +19,13 @@ def contest(benchmark):
         @benchmark
         def run_bench():
             with input_path.open('r') as input_file:
-                res = subprocess.run(comlist, stdin=input_file,
-                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                res = subprocess.run(
+                    comlist,
+                    stdin=input_file,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+
             assert res.stderr == b''
             assert res.returncode == 0
             return res.stdout.decode("utf-8")
@@ -40,4 +48,12 @@ def pytest_generate_tests(metafunc):
         )
         for program in Path("problems").glob("**/*.py")
         for case in program.parent.glob("**/*.in")
+        if _filter_non_executable(program)
     ])
+
+
+def _filter_non_executable(path):
+    is_exe = access(path, X_OK)
+    if not is_exe:
+        warnings.warn(UserWarning(f"{path} is not executable."))
+    return is_exe
