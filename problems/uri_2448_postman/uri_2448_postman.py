@@ -2,7 +2,7 @@
 import sys
 
 rl = sys.stdin.readline
-rl() # discart n, m info
+rl()  # discart n, m info
 
 houses = {x: idx for idx, x in enumerate(rl().split())}
 cum_time = 0

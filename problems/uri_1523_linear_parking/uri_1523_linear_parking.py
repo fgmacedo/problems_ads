@@ -12,7 +12,10 @@ rl = sys.stdin.readline
 
 
 def can_handle(k, schedule):
-    CAN_HANDLE_MSG = ("Nao", "Sim", )
+    CAN_HANDLE_MSG = (
+        "Nao",
+        "Sim",
+    )
     can_handle = True
     park = deque()
 
@@ -51,9 +54,7 @@ while True:
 
     schedule = (map(int, rl().split()) for _ in range(n))
 
-    results.append(
-        can_handle(k, schedule)
-    )
+    results.append(can_handle(k, schedule))
 
 if results:
-    sys.stdout.write("\n".join(results) + '\n')
+    sys.stdout.write("\n".join(results) + "\n")
