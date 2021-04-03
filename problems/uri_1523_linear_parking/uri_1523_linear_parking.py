@@ -12,39 +12,37 @@ To turn on optional debug:
 import sys
 from collections import deque
 
-CAN_HANDLE_MSG = ("Nao", "Sim", )
-
 rl = sys.stdin.readline
 
 
-class Park:
+def can_handle(k, schedule):
+    CAN_HANDLE_MSG = ("Nao", "Sim", )
+    can_handle = True
+    park = deque()
 
-    def __init__(self, k):
-        self.k = k
-        self.drivers = deque()
-        self.can_handle = True
+    for start, end in schedule:
+        if not can_handle:
+            continue
 
-    def add_driver(self, start, end):
-        if not self.can_handle:
-            return
+        last_start, last_end = _peek(park)
+        while last_end and start >= last_end and park:
+            park.pop()
+            last_start, last_end = _peek(park)
 
-        last_start, last_end = self._peek
-        while last_end and start >= last_end and self.drivers:
-            self.drivers.pop()
-            last_start, last_end = self._peek
+        if len(park) + 1 > k:
+            can_handle = False
+            continue
 
-        if len(self.drivers) + 1 > self.k:
-            self.can_handle = False
-            return
-
-        if not self.drivers or (start >= last_start and end <= last_end):
-            self.drivers.append((start, end))
+        if not park or (start >= last_start and end <= last_end):
+            park.append((start, end))
         else:
-            self.can_handle = False
+            can_handle = False
 
-    @property
-    def _peek(self):
-        return self.drivers[-1] if self.drivers else (None, None)
+    return CAN_HANDLE_MSG[can_handle]
+
+
+def _peek(park):
+    return park[-1] if park else (None, None)
 
 
 results = []
@@ -57,10 +55,9 @@ while True:
 
     schedule = (map(int, rl().split()) for _ in range(n))
 
-    p = Park(k)
-    for start, end in schedule:
-        p.add_driver(start, end)
-    results.append(f"{CAN_HANDLE_MSG[p.can_handle]}")
+    results.append(
+        can_handle(k, schedule)
+    )
 
 if results:
     sys.stdout.write("\n".join(results) + '\n')
