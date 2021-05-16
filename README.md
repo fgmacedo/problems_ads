@@ -50,8 +50,8 @@ All problems and test scenarios will be collected automatically when you run pyt
 
 ```
 ❯ pytest -v
-======== test session starts ======== 
-linux -- Python 3.8.1, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- 
+======== test session starts ========
+linux -- Python 3.8.1, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 --
 ...
 collected 7 items
 
@@ -68,7 +68,21 @@ tests.py::test_contests[problems/uri_2448_postman/uri_2448_postman.py-case_small
 
 You can also run benchmarks when running with:
 
-``` 
+```
  pytest --benchmark-enable
 ```
 
+## Testing code manually
+
+Inspect profiling:
+
+```
+cat problems/kattis_ferryloading4/sample.in | python -m cProfile -s cumtime ./problems/kattis_ferryloading4/kattis_ferryloading4.py --debug
+```
+
+
+Find unused code using [vulture](https://github.com/jendrikseipp/vulture):
+
+```
+cat problems/url_1030_flavius_josephhus/sample.in | python -m vulture ./problems/url_1030_flavius_josephhus/url_1030_flavius_josephhus.py
+```

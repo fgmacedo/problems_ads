@@ -6,7 +6,7 @@ from os import access, X_OK
 import pytest
 
 
-SLICE_REMOVE_INPUT_PREFIX_AND_SUFFIX = slice(0, -3)
+SLICE_REMOVE_INPUT_EXTENSION = slice(0, -3)  # removes '.in'
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def pytest_generate_tests(metafunc):
                 program,
                 case,
                 case.with_suffix(".out"),
-                id=f"{program}-{case.name[SLICE_REMOVE_INPUT_PREFIX_AND_SUFFIX]}",
+                id=f"{program}-{case.name[SLICE_REMOVE_INPUT_EXTENSION]}",
             )
             for program in Path("problems").glob("**/*.py")
             for case in program.parent.glob("**/*.in")
