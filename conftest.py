@@ -1,18 +1,48 @@
-import warnings
+import shutil
 import subprocess
-from pathlib import Path
 from os import access, X_OK
+from pathlib import Path
 
 import pytest
 
 
 SLICE_REMOVE_INPUT_EXTENSION = slice(0, -3)  # removes '.in'
+SUPPORTED_EXTENSIONS = ["py", "cpp"]
+
+
+def _is_executable(path):
+    return access(path, X_OK)
+
+
+def _compile_cpp(path):
+    gpp = shutil.which("g++")
+
+    output_file = path.with_suffix(".o")
+    args = [gpp, "-std=c++11", "-O2", "-Wall", f"{path}", "-o", f"{output_file}"]
+    res = subprocess.run(
+        args,
+        capture_output=True,
+    )
+    assert res.stderr == b"", ' '.join(args)
+    assert res.returncode == 0
+    return output_file
 
 
 @pytest.fixture
-def contest(benchmark):
-    def run(contest, input_path):
-        comlist = [f"./{contest}"]
+def compiled_program(solution_path):
+    if solution_path.suffix == ".py" and not _is_executable(solution_path):
+        raise pytest.xfail(f"{solution_path} is not executable.")
+
+    if solution_path.suffix == ".cpp":
+        solution_path = _compile_cpp(solution_path)
+
+    return solution_path
+
+
+@pytest.fixture
+def contest(benchmark, compiled_program):
+    def run(input_path):
+        comlist = [f"./{compiled_program}"]
 
         @benchmark
         def run_bench():
@@ -34,27 +64,20 @@ def contest(benchmark):
 
 
 def pytest_generate_tests(metafunc):
-    if "program" not in metafunc.fixturenames:
+    if "contest" not in metafunc.fixturenames:
         return
 
     metafunc.parametrize(
-        "program, input_file, output_file",
+        "solution_path, input_file, output_file",
         [
             pytest.param(
-                program,
+                solution_path,
                 case,
                 case.with_suffix(".out"),
-                id=f"{program}-{case.name[SLICE_REMOVE_INPUT_EXTENSION]}",
+                id=f"{solution_path}-{case.name[SLICE_REMOVE_INPUT_EXTENSION]}",
             )
-            for program in Path("problems").glob("**/*.py")
-            for case in program.parent.glob("**/*.in")
-            if _filter_non_executable(program)
+            for extension in SUPPORTED_EXTENSIONS
+            for solution_path in Path("problems").glob(f"**/*.{extension}")
+            for case in solution_path.parent.glob("**/*.in")
         ],
     )
-
-
-def _filter_non_executable(path):
-    is_exe = access(path, X_OK)
-    if not is_exe:
-        warnings.warn(UserWarning(f"{path} is not executable."))
-    return is_exe
