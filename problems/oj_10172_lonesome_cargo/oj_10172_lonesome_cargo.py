@@ -31,8 +31,7 @@ for _ in range(number_of_inputs):
     station_count, cargo_max, station_max = n, s, q
 
     stations = deque(
-        Station(idx + 1, map(int, rl().split()[1:]))
-        for idx in range(station_count)
+        Station(idx + 1, map(int, rl().split()[1:])) for idx in range(station_count)
     )
 
     carrier = deque()
@@ -45,7 +44,9 @@ for _ in range(number_of_inputs):
         # for each cargo, if it has the station at target, unloads to A
         #   else, unloads to the end of queue B if has space.
         unload_operations = 0
-        while carrier and (station_max - len(station.b) > 0 or carrier[-1] == station.name):
+        while carrier and (
+            station_max - len(station.b) > 0 or carrier[-1] == station.name
+        ):
             unload_operations += 1
             cargo = carrier.pop()
             if cargo != station.name:

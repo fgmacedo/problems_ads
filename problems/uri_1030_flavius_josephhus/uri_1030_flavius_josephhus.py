@@ -79,14 +79,13 @@ class ListaEnc:
 
 
 results = []
-for case_no in range(1, number_of_testcases+1):
+for case_no in range(1, number_of_testcases + 1):
     # n (1 ≤ n ≤ 10000 ): peoples in the circle
     # k (1 ≤ k ≤ 1000): jump step to the next man that will be killed
     n, k = map(int, rl().split())
 
-
     l = ListaEnc()
-    for i in range(1, n+1):
+    for i in range(1, n + 1):
         l.add(i)
 
     gen = l.loop(k)

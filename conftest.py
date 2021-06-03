@@ -24,7 +24,7 @@ def _compile_cpp(path):
         args,
         capture_output=True,
     )
-    assert res.stderr == b"", ' '.join(args)
+    assert res.stderr == b"", " ".join(args)
     assert res.returncode == 0
     return output_file
 
@@ -33,9 +33,7 @@ def _compile_cpp(path):
 def compiled_program(solution_path):
     if solution_path.suffix == ".py" and not _is_executable(solution_path):
         warnings.warn(f"Try to run 'chmod +x {solution_path}'.")
-        raise pytest.skip(
-            f"{solution_path} is not executable."
-        )
+        raise pytest.skip(f"{solution_path} is not executable.")
 
     if solution_path.suffix == ".cpp":
         solution_path = _compile_cpp(solution_path)

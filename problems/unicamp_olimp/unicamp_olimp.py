@@ -12,10 +12,7 @@ rl = sys.stdin.readline
 # número de países (1 ≤ N ≤ 100), número de modalidades (1 ≤ M ≤ 100)
 n, m = map(int, rl().split())
 
-countries = {
-    cno: [0, 0, 0, n+1-cno, cno]
-    for cno in range(1, n+1)
-}
+countries = {cno: [0, 0, 0, n + 1 - cno, cno] for cno in range(1, n + 1)}
 
 for _ in range(m):
     # o, p, b = ouro, prata, bronze
