@@ -58,6 +58,8 @@ class Node:
         root = Node(data_root)
         if insert_fn:
             insert_fn(root)
+
+        # TODO: Remove recursion.
         cls.from_pre_and_infix(prefix=prefix, infix=data_left, insert_fn=root._ins_left)
         cls.from_pre_and_infix(
             prefix=prefix,
