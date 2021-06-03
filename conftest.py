@@ -1,5 +1,6 @@
 import shutil
 import subprocess
+import warnings
 from os import access, X_OK
 from pathlib import Path
 
@@ -31,7 +32,10 @@ def _compile_cpp(path):
 @pytest.fixture
 def compiled_program(solution_path):
     if solution_path.suffix == ".py" and not _is_executable(solution_path):
-        raise pytest.xfail(f"{solution_path} is not executable.")
+        warnings.warn(f"Try to run 'chmod +x {solution_path}'.")
+        raise pytest.skip(
+            f"{solution_path} is not executable."
+        )
 
     if solution_path.suffix == ".cpp":
         solution_path = _compile_cpp(solution_path)
