@@ -11,7 +11,7 @@ Os mapas foram discretizados em células, sendo que as células podem correspond
 ## Entrada
 A entrada é composta por vários mapas, sendo que a descrição de cada mapa começa com uma linha contendo dois inteiros N e M, correspondente ao número de linhas e de colunas do mapa. As N linhas a seguir descrevem o mapa, cada linha contendo M caracteres, além do pulo de linha. Os caracteres possíveis são: A, que representa uma célula contendo água, X, que representa uma célula com rocha e T que representa uma célula com agente contaminante.
 
-A entrada termina quando N = M = 0, caso que não deve ser processado. Em todos os mapas, N e M são menores ou iguais a 50.
+A entrada termina quando `N = M = 0`, caso que não deve ser processado. Em todos os mapas, N e M são menores ou iguais a 50.
 
 ## Saída
 Para cada mapa, imprima uma estimação da contaminação futura. Esta estimação deverá corresponder ao mapa original (como visto na entrada), porém trocando as células com água que foram contaminadas pelo caractere T. Deixe uma linha em branco após cada mapa (incluindo o último mapa).
@@ -22,6 +22,16 @@ In:
 ```
 6 7
 XXAAXXX
+XXAAXAX
+XXXXAXX
+XAAAAAX
+TAAXAAA
+XXXXXXX
+3 3
+TTT
+XXX
+AAA
+0 0
 ```
 
 Out:
@@ -29,4 +39,13 @@ Out:
 ```
 XXAAXXX
 XXAAXAX
+XXXXTXX
+XTTTTTX
+TTTXTTT
+XXXXXXX
+
+TTT
+XXX
+AAA
+
 ```
