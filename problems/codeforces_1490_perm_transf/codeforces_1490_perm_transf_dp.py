@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 import sys
+from collections import deque
+
+"""
+Solution using dynamic programming (interactive solution instead of recursive)
+"""
 
 
 class Node:
@@ -10,29 +15,38 @@ class Node:
         self.right = None
 
     @classmethod
-    def from_permutation(cls, permutation, insert_fn=None, depth=0):
-        if not permutation:
-            return
-
-        data_root = max(permutation)
-        root_index = permutation.index(data_root)
-
-        data_left, data_right = (
-            permutation[0:root_index],
-            permutation[root_index + 1 :],
+    def from_permutation(cls, permutation):
+        permutations = deque(
+            [
+                (permutation, None, 0),
+            ]
         )
+        main_root = None
 
-        root = Node(data_root, depth=depth)
-        if insert_fn:
-            insert_fn(root)
-        cls.from_permutation(
-            permutation=data_left, insert_fn=root._ins_left, depth=depth + 1
-        )
-        cls.from_permutation(
-            permutation=data_right, insert_fn=root._ins_right, depth=depth + 1
-        )
+        while permutations:
+            permutation, insert_fn, depth = permutations.popleft()
 
-        return root
+            data_root = max(permutation)
+            root_index = permutation.index(data_root)
+
+            data_left, data_right = (
+                permutation[0:root_index],
+                permutation[root_index + 1 :],
+            )
+
+            root = Node(data_root, depth=depth)
+            if main_root is None:
+                main_root = root
+
+            if insert_fn:
+                insert_fn(root)
+
+            if data_left:
+                permutations.append((data_left, root._ins_left, depth + 1))
+            if data_right:
+                permutations.append((data_right, root._ins_right, depth + 1))
+
+        return main_root
 
     def _ins_left(self, node):
         self.left = node
