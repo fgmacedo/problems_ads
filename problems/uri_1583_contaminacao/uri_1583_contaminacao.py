@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# import pydot
 import sys
 from collections import defaultdict, deque
 
@@ -21,12 +22,12 @@ class Cell:
         self.column = column
 
     def __hash__(self) -> int:
-        return hash(self.value) + hash(self.row) + hash(self.column)
+        return hash(self.row) + hash(self.column)
 
     def __eq__(self, o: object) -> bool:
         if isinstance(o, str):
             return self.value == o
-        return self.value == o.value and self.row == o.row and self.column == o.column
+        return self.row == o.row and self.column == o.column
 
     def __repr__(self) -> str:
         return f"C({repr(self.value)}, {self.row}, {self.column})"
@@ -34,6 +35,8 @@ class Cell:
     def __str__(self) -> str:
         return self.value
 
+    # def as_node(self):
+    #     return pydot.Node(repr(self), shape='circle')
 
 class Graph:
     def __init__(self):
@@ -65,24 +68,46 @@ class Graph:
 
         return g
 
+    # def _repr_svg_(self):
+    #     """
+    #     SVG Representation used for debug purposes on Jupyter.
+    #     Also import for interactive representation:
 
-def propagation(g):
-    """
-    Brute forcing here...  I think that a BSF is applicable.
-    """
-    keep_processing = True
-    while keep_processing:
-        keep_processing = False
-        for vertex in g:
-            for adj in g.adjacents(vertex):
-                if vertex.value == WATER and adj.value == CONTAMINANT:
-                    vertex.value = CONTAMINANT
-                    keep_processing = True
+    #         from IPython.display import SVG, display
+    #     """
+    #     graph = pydot.Dot('list', graph_type='graph')
+
+    #     for vertex in self:
+    #         node = vertex.as_node()
+    #         if vertex.value == WATER:
+    #             node.set_color("blue")
+    #         elif vertex.value == CONTAMINANT:
+    #             node.set_color("turquoise")
+
+    #         graph.add_node(node)
+    #         for adj in self.adjacents(vertex):
+    #             edge = pydot.Edge(repr(vertex), repr(adj))
+    #             graph.add_edge(edge)
+
+    #     return graph.create_svg().decode()
 
 
-if __name__ == "__main__":
-    rl = sys.stdin.readline
+def bfs(g, s):
+    visited = set()
+    queue = deque()
 
+    queue.append(s)
+    visited.add(s)
+    while queue:
+        vertex = queue.popleft()
+        yield vertex
+        for adj in g.adjacents(vertex):
+            if adj not in visited:
+                queue.append(adj)
+                visited.add(adj)
+
+
+def main(rl):
     solutions = []
     while True:
 
@@ -103,19 +128,37 @@ if __name__ == "__main__":
         for row in map:
             prev_cell = None
             for cell in row:
+                if cell == STONE:
+                    prev_cell = None
+                    continue
                 if prev_cell:
                     g.ins_edge(prev_cell, cell)
                 prev_cell = cell
             if prev_row:
                 for above_cell, current_cell in zip(prev_row, row):
+                    if above_cell == STONE or current_cell == STONE:
+                        continue
                     g.ins_edge(above_cell, current_cell)
             prev_row = row
 
-        propagation(g)
+        all_contamined = [v for v in g if v == CONTAMINANT]
+        for contamined in all_contamined:
+            for vertex in bfs(g, contamined):
+                if vertex.value == WATER:
+                    vertex.value = CONTAMINANT
+                # display(SVG(g._repr_svg_()))
 
         new_map = []
         for row in map:
             new_map.append("".join(str(cell) for cell in row))
         solutions.append("\n".join(new_map))
 
-    print("\n\n".join(solutions) + "\n")
+    return "\n\n".join(solutions) + "\n"
+
+
+
+if __name__ == "__main__":
+    rl = sys.stdin.readline
+    solutions = main(rl)
+    print(solutions)
+
