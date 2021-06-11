@@ -38,6 +38,7 @@ class Cell:
     # def as_node(self):
     #     return pydot.Node(repr(self), shape='circle')
 
+
 class Graph:
     def __init__(self):
         self._g = defaultdict(deque)
@@ -156,9 +157,7 @@ def main(rl):
     return "\n\n".join(solutions) + "\n"
 
 
-
 if __name__ == "__main__":
     rl = sys.stdin.readline
     solutions = main(rl)
     print(solutions)
-

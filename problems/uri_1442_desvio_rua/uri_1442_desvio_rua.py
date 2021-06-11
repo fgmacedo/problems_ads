@@ -41,9 +41,9 @@ def tarjan(graph):
                 low[v] = num
                 stack.append(v)
             if pi > 0:
-                low[v] = min(low[v], low[graph[v][pi-1]])
+                low[v] = min(low[v], low[graph[v][pi - 1]])
             if pi < len(graph[v]):
-                call_stack.append((v, pi+1, num))
+                call_stack.append((v, pi + 1, num))
                 call_stack.append((graph[v][pi], 0, len(low)))
                 continue
             if num == low[v]:
@@ -80,6 +80,7 @@ def find_change_way_solution(g):
         if len(tarjan(new_g)) == 1:
             # print("found solution")
             return v1, v2
+
 
 class Graph:
     def __init__(self):
@@ -162,7 +163,6 @@ def main(rl):
         # m (1 ≤ M ≤ 10^5)  número de ruas da cidade
         _n_crossings, m_streets = [int(x) for x in new_test_case.split()]
 
-
         digraph = Graph()
         graph = Graph()
         blocked_street = None
@@ -175,7 +175,6 @@ def main(rl):
                 blocked_street = (a_origin, b_dest)
             digraph.ins_edge(a_origin, b_dest, directed=t_direction == 1)
             graph.ins_edge(a_origin, b_dest, directed=False)
-
 
         digraph.remove_edge(*blocked_street)
         graph.remove_edge(*blocked_street)
@@ -197,9 +196,7 @@ def main(rl):
     return "\n".join(solutions)
 
 
-
 if __name__ == "__main__":
     rl = sys.stdin.readline
     solutions = main(rl)
     print(solutions)
-
