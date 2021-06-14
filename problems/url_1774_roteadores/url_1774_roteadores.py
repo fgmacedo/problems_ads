@@ -141,10 +141,7 @@ def mst_cost(graph):
 def main(rl):
     _r_num_routers, c_num_cables = [int(x) for x in rl().split()]
 
-    g = Graph.from_edges(
-        [int(x) for x in rl().split()]
-        for _ in range(c_num_cables)
-    )
+    g = Graph.from_edges([int(x) for x in rl().split()] for _ in range(c_num_cables))
 
     mst, cost = mst_cost(g)
 
