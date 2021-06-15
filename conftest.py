@@ -19,7 +19,9 @@ def _compile_cpp(path):
     gpp = shutil.which("g++")
 
     output_file = path.with_suffix(".o")
-    args = [gpp, "-std=c++11", "-O2", "-Wall", f"{path}", "-o", f"{output_file}"]
+
+    # considering export warnings with `"-Wall", `
+    args = [gpp, "-std=c++11", "-O2", f"{path}", "-o", f"{output_file}"]
     res = subprocess.run(
         args,
         capture_output=True,
